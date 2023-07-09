@@ -10,6 +10,10 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS ON)
 
+# glad
+include_directories(${CMAKE_SOURCE_DIR}/third_party/includes)
+add_library(GLAD "${CMAKE_SOURCE_DIR}/third_party/glad.c")
+
 add_library(imgui STATIC
 ${CMAKE_SOURCE_DIR}/imgui/imgui.cpp
 ${CMAKE_SOURCE_DIR}/imgui/imgui_demo.cpp
