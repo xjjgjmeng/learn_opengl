@@ -54,8 +54,8 @@ void imguiDraw()
 
     // 2. Show a simple window that we create ourselves. We use a Begin/End pair to create a named window.
     {
-        static float f = 0.0f;
-        static int counter = 0;
+        //static float f = 0.0f;
+        //static int counter = 0;
 
         ImGui::Begin("Hello, world!");                          // Create a window called "Hello, world!" and append into it.
         ImGui::Checkbox("enableMouseMove", &GlNs::gData.enableMouseMove);
@@ -63,13 +63,13 @@ void imguiDraw()
         ImGui::Checkbox("Demo Window", &GlNs::gData.show_demo_window);      // Edit bools storing our window open/close state
         ImGui::Checkbox("Another Window", &GlNs::gData.show_another_window);
 
-        ImGui::SliderFloat("float", &f, 0.0f, 1.0f);            // Edit 1 float using a slider from 0.0f to 1.0f
+        //ImGui::SliderFloat("float", &f, 0.0f, 1.0f);            // Edit 1 float using a slider from 0.0f to 1.0f
         ImGui::ColorEdit3("clear color", (float*)&GlNs::gData.clear_color); // Edit 3 floats representing a color
 
         ImGui::SliderFloat("angle", &GlNs::gData.ang, -360, 360);
         ImGui::SliderFloat("nearP", &GlNs::gData.nearP, 0, GlNs::gData.farP);
         ImGui::SliderFloat("farP", &GlNs::gData.farP, GlNs::gData.nearP, 300.f);
-        ImGui::SliderFloat("FOV", &GlNs::gData.camera.camera.Zoom, 0.f, 100.f);
+        ImGui::SliderFloat("FOV(degrees)", &GlNs::gData.camera.camera.Zoom, 0.f, 100.f);
 
 
         ImGui::Checkbox("depth testing", &GlNs::gData.depthTesting);

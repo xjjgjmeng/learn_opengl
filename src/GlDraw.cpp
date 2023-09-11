@@ -126,14 +126,15 @@ void glInit()
 
 void glDraw()
 {
-    if (GlNs::gData.depthTesting)
-    {
-        glEnable(GL_DEPTH_TEST);
-    }
-    else
-    {
-        glDisable(GL_DEPTH_TEST);
-    }
+    GlNs::gData.depthTesting ? glEnable(GL_DEPTH_TEST) : glDisable(GL_DEPTH_TEST);
+    //if (GlNs::gData.depthTesting)
+    //{
+    //    glEnable(GL_DEPTH_TEST);
+    //}
+    //else
+    //{
+    //    glDisable(GL_DEPTH_TEST);
+    //}
     glClearColor(GlNs::gData.clear_color.x * GlNs::gData.clear_color.w, GlNs::gData.clear_color.y * GlNs::gData.clear_color.w, GlNs::gData.clear_color.z * GlNs::gData.clear_color.w, GlNs::gData.clear_color.w);
     //glClear(GL_COLOR_BUFFER_BIT);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -153,12 +154,15 @@ void glDraw()
     glm::mat4 projection{ 1.f };
     if (GlNs::gData.rotateByTime)
     {
-        model = glm::rotate(model, (float)glfwGetTime() * glm::radians(50.0f), glm::vec3(0.5f, 1.0f, 0.0f));
+        //model = glm::rotate(model, (float)glfwGetTime() * glm::radians(50.0f), glm::vec3(0.5f, 1.0f, 0.0f));
+        GlNs::gData.ang+=0.5f;
+        if (GlNs::gData.ang>= 360.f)
+        {
+            GlNs::gData.ang = -360.f;
+        }
     }
-    else
-    {
-        model = glm::rotate(model, glm::radians(GlNs::gData.ang), glm::vec3{ 1.f,0.f,0.f });
-    }
+    model = glm::rotate(model, glm::radians(GlNs::gData.ang), glm::vec3{ 1.f,0.f,0.f });
+
     //model = glm::rotate(model, (float)std::time(nullptr) * glm::radians(50.0f), glm::vec3(0.5f, 1.0f, 0.0f));
     if (GlNs::gData.camera.autoRotation)
     {
