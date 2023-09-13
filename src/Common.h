@@ -31,7 +31,8 @@ namespace GlNs
 		bool depthTesting{true};
 		bool showMore{ false };
 		bool rotateByTime{ true };
-		int shininess{32};
+		bool showSmile{false};
+		float shininess{32};
 		struct
 		{
 			//glm::vec3 pos{ 2.f, 2.0f, -2.0f };//??

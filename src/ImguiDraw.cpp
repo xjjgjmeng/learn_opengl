@@ -28,7 +28,7 @@ namespace
             auto& lamp = GlNs::gData.lamp;
             ImGui::Checkbox("autoRotation", &lamp.autoRotation);
             ImGui::DragFloat3("pos", &lamp.pos[0], .05f);
-            ImGui::DragInt("shininess", &GlNs::gData.shininess, 2, 2, 256);
+            ImGui::DragFloat("shininess", &GlNs::gData.shininess, 2, 2, 256);
             ImGui::TreePop();
         }
     }
@@ -71,6 +71,7 @@ void imguiDraw()
 
         ImGui::Begin("Hello, world!");                          // Create a window called "Hello, world!" and append into it.
         ImGui::Checkbox("enableMouseMove", &GlNs::gData.enableMouseMove);
+        ImGui::Checkbox("showSmile", &GlNs::gData.showSmile);
         ImGui::Text("This is some useful text.");               // Display some text (you can use a format strings too)
         ImGui::Checkbox("Demo Window", &GlNs::gData.show_demo_window);      // Edit bools storing our window open/close state
         ImGui::Checkbox("Another Window", &GlNs::gData.show_another_window);

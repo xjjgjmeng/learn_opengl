@@ -157,10 +157,6 @@ void glDraw()
         GlNs::gData.lamp.pos.z = camZ;
     }
 
-    auto transform = glm::mat4{ 1.0f };
-    transform = glm::translate(transform, glm::vec3{ 0.5f, -0.5f, 0.0f });
-    transform = glm::rotate(transform, glm::radians(GlNs::gData.ang), glm::vec3{ 0.f, 0.f, 1.f });
-
     glm::mat4 model{ 1.f };
     glm::mat4 view{ 1.f };
     glm::mat4 projection{ 1.f };
@@ -168,12 +164,12 @@ void glDraw()
     {
         GlNs::gData.ang = static_cast<float>(std::sin(glfwGetTime() / 3) * 360.f);
     }
-    model = glm::rotate(model, glm::radians(GlNs::gData.ang), glm::vec3{ 1.f,0.f,0.f });
+    model = glm::rotate(model, glm::radians(GlNs::gData.ang), glm::vec3{ 1.f,1.f,0.f });
 
     if (GlNs::gData.camera.autoRotation)
     {
 #if 1
-        auto radius = 3.f;
+        auto radius = 8.f;
         const auto camX = static_cast<float>(std::sin(glfwGetTime()) * radius);
         const auto camZ = static_cast<float>(std::cos(glfwGetTime()) * radius);
         view = glm::lookAt(glm::vec3(camX, 0.f, camZ), glm::vec3(0.f, 0.f, 0.f), glm::vec3{ 0.f, 1.f, 0.f });
@@ -193,9 +189,24 @@ void glDraw()
     ourShader->setMat4("model", model);
     ourShader->setMat4("view", view);
     ourShader->setMat4("projection", projection);
-    ourShader->setVec3("lightPos", GlNs::gData.lamp.pos);
+    ourShader->setVec3("light.position", GlNs::gData.lamp.pos);
     ourShader->setVec3("viewPos", GlNs::gData.camera.camera.Position);
-    ourShader->setInt("shininess", GlNs::gData.shininess);
+    //ourShader->setInt("shininess", GlNs::gData.shininess);
+    ourShader->setBool("showSmile", GlNs::gData.showSmile);
+
+    glm::vec3 lightColor;
+    lightColor.x = static_cast<float>(std::sin(glfwGetTime()*2.0));
+    lightColor.y = static_cast<float>(std::sin(glfwGetTime()*0.7));
+    lightColor.z = static_cast<float>(std::sin(glfwGetTime()*1.3));
+    glm::vec3 diffuseColor = lightColor * glm::vec3(0.5f);
+    glm::vec3 ambientColor = diffuseColor * glm::vec3(0.2f);
+    ourShader->setVec3("light.ambient", ambientColor);
+    ourShader->setVec3("light.diffuse", diffuseColor);
+    ourShader->setVec3("light.specular", 1.f, 1.f, 1.f);
+    ourShader->setVec3("material.ambient", 1.f, .5f, .31f);
+    ourShader->setVec3("material.diffuse", 1.f, .5f, .31f);
+    ourShader->setVec3("material.specular", .5f, .5f, .5f);
+    ourShader->setFloat("material.shininess", GlNs::gData.shininess);
 
     glBindVertexArray(GlNs::gData.VAO);
     //glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
