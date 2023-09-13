@@ -20,6 +20,18 @@ namespace
             ImGui::TreePop();
         }
     }
+
+    void lampSetup()
+    {
+        if (ImGui::TreeNode("Lamp"))
+        {
+            auto& lamp = GlNs::gData.lamp;
+            ImGui::Checkbox("autoRotation", &lamp.autoRotation);
+            ImGui::DragFloat3("pos", &lamp.pos[0], .05f);
+            ImGui::DragInt("shininess", &GlNs::gData.shininess, 2, 2, 256);
+            ImGui::TreePop();
+        }
+    }
 }
 
 void imguiInit()
@@ -65,6 +77,7 @@ void imguiDraw()
 
         //ImGui::SliderFloat("float", &f, 0.0f, 1.0f);            // Edit 1 float using a slider from 0.0f to 1.0f
         ImGui::ColorEdit3("clear color", (float*)&GlNs::gData.clear_color); // Edit 3 floats representing a color
+        ImGui::ColorEdit4("lamp color", (float*)&GlNs::gData.lamp_color); // Edit 3 floats representing a color
 
         ImGui::SliderFloat("angle", &GlNs::gData.ang, -360, 360);
         ImGui::SliderFloat("nearP", &GlNs::gData.nearP, 0, GlNs::gData.farP);
@@ -77,6 +90,7 @@ void imguiDraw()
         ImGui::Checkbox("rotate by time", &GlNs::gData.rotateByTime);
 
         cameraSetup();
+        lampSetup();
 
         ImGuiIO& io = ImGui::GetIO();
         ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / io.Framerate, io.Framerate);

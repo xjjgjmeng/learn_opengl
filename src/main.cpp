@@ -199,7 +199,7 @@ int main(int, char**)
             int display_w, display_h;
             glfwGetFramebufferSize(window, &display_w, &display_h);
             glViewport(0, 0, display_w, display_h);
-            std::cout << glfwGetTime() << std::endl;
+            //std::cout << glfwGetTime() << std::endl;
             glDraw();
 
             //float timeValue = glfwGetTime();

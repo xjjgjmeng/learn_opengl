@@ -16,8 +16,10 @@ namespace GlNs
 	{
 		bool enableMouseMove{false};
 		ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
+		ImVec4 lamp_color = ImVec4(1.f, 1.f, 1.f, 1.f);
 		float ang;
 		unsigned int VAO, VBO;
+		unsigned int lightCubeVAO;
 		bool show_demo_window = false;
 		bool show_another_window = false;
 		GLFWwindow* window{};
@@ -29,6 +31,13 @@ namespace GlNs
 		bool depthTesting{true};
 		bool showMore{ false };
 		bool rotateByTime{ true };
+		int shininess{32};
+		struct
+		{
+			//glm::vec3 pos{ 2.f, 2.0f, -2.0f };//??
+			glm::vec3 pos{ 0.65f, 0.2f, 1.75f };//??
+			bool autoRotation{false};
+		} lamp;
 		struct
 		{
 			Camera camera{ glm::vec3{0.f, 0.f, 3.f} };
