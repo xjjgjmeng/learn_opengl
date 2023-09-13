@@ -10,6 +10,11 @@
 
 #include "camera.h"
 
+enum class LightType : int
+{
+	Directional = 0, Point, Spot,
+};
+
 namespace GlNs
 {
 	struct GlobalData
@@ -38,6 +43,10 @@ namespace GlNs
 			//glm::vec3 pos{ 2.f, 2.0f, -2.0f };//??
 			glm::vec3 pos{ 0.65f, 0.2f, 1.75f };//??
 			bool autoRotation{false};
+			//bool directional{false};
+			LightType type{ LightType::Directional };
+			bool attenuation{false};
+			bool softEdges{false};
 		} lamp;
 		struct
 		{

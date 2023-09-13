@@ -26,7 +26,22 @@ namespace
         if (ImGui::TreeNode("Lamp"))
         {
             auto& lamp = GlNs::gData.lamp;
+
+            if (ImGui::TreeNode("Point Light"))
+            {
+                ImGui::Checkbox("attenuation", &lamp.attenuation);
+                ImGui::TreePop();
+            }
+
             ImGui::Checkbox("autoRotation", &lamp.autoRotation);
+            ImGui::Checkbox("softEdges", &lamp.softEdges);
+            //ImGui::Checkbox("directional", &lamp.directional);
+
+            auto& lampType = lamp.type;
+            ImGui::RadioButton("Directional", reinterpret_cast<int*>(&lampType), static_cast<int>(LightType::Directional)); ImGui::SameLine();
+            ImGui::RadioButton("Point", reinterpret_cast<int*>(&lampType), static_cast<int>(LightType::Point)); ImGui::SameLine();
+            ImGui::RadioButton("Spot", reinterpret_cast<int*>(&lampType), static_cast<int>(LightType::Spot));
+
             ImGui::DragFloat3("pos", &lamp.pos[0], .05f);
             ImGui::DragFloat("shininess", &GlNs::gData.shininess, 2, 2, 256);
             ImGui::TreePop();

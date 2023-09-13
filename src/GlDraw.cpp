@@ -246,20 +246,54 @@ void glDraw()
     ourShader->setMat4("model", model);
     ourShader->setMat4("view", view);
     ourShader->setMat4("projection", projection);
-    ourShader->setVec3("light.position", GlNs::gData.lamp.pos);
+
+    ourShader->setInt("light.type", static_cast<int>(GlNs::gData.lamp.type));
+    switch (GlNs::gData.lamp.type)
+    {
+    case LightType::Directional:
+        ourShader->setVec3("light.direction", -GlNs::gData.lamp.pos);
+        break;
+    case LightType::Point:
+        ourShader->setVec3("light.position", GlNs::gData.lamp.pos);
+        ourShader->setBool("light.attenuation", GlNs::gData.lamp.attenuation);
+        ourShader->setFloat("light.constant", 1.0f);
+        ourShader->setFloat("light.linear", 0.09f);
+        ourShader->setFloat("light.quadratic", 0.032f);
+        break;
+    case LightType::Spot:
+#if 1
+        ourShader->setVec3("light.position", GlNs::gData.lamp.pos);
+        ourShader->setVec3("light.direction", -GlNs::gData.lamp.pos);
+#else
+        ourShader->setVec3("light.position", GlNs::gData.camera.camera.Position);
+        ourShader->setVec3("light.direction", GlNs::gData.camera.camera.Front);
+#endif
+        ourShader->setFloat("light.cutOff", glm::cos(glm::radians(12.5f)));
+        ourShader->setFloat("light.outerCutOff", glm::cos(glm::radians(17.5f)));
+        ourShader->setBool("light.softEdges", GlNs::gData.lamp.softEdges);
+        break;
+    default:
+        break;
+    }
+
     ourShader->setVec3("viewPos", GlNs::gData.camera.camera.Position);
     //ourShader->setInt("shininess", GlNs::gData.shininess);
     ourShader->setBool("showSmile", GlNs::gData.showSmile);
-
     glm::vec3 lightColor;
     lightColor.x = static_cast<float>(std::sin(glfwGetTime()*2.0));
     lightColor.y = static_cast<float>(std::sin(glfwGetTime()*0.7));
     lightColor.z = static_cast<float>(std::sin(glfwGetTime()*1.3));
     glm::vec3 diffuseColor = lightColor * glm::vec3(0.5f);
     glm::vec3 ambientColor = diffuseColor * glm::vec3(0.2f);
+#if 0
     ourShader->setVec3("light.ambient", ambientColor);
     ourShader->setVec3("light.diffuse", diffuseColor);
     ourShader->setVec3("light.specular", 1.f, 1.f, 1.f);
+#else
+    ourShader->setVec3("light.ambient", 0.2f, 0.2f, 0.2f);
+    ourShader->setVec3("light.diffuse", 0.5f, 0.5f, 0.5f);
+    ourShader->setVec3("light.specular", 1.0f, 1.0f, 1.0f);
+#endif
     ourShader->setVec3("material.ambient", 1.f, .5f, .31f);
     ourShader->setVec3("material.diffuse", 1.f, .5f, .31f);
     ourShader->setVec3("material.specular", .5f, .5f, .5f);
