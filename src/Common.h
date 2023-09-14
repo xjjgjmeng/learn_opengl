@@ -19,6 +19,13 @@ namespace GlNs
 {
 	struct GlobalData
 	{
+		// positions of the point lights
+		glm::vec3 pointLightPositions[4]{
+			glm::vec3(0.7f,  0.2f,  2.0f),
+			glm::vec3(2.3f, -3.3f, -4.0f),
+			glm::vec3(-4.0f,  2.0f, -12.0f),
+			glm::vec3(0.0f,  0.0f, -3.0f)
+		};
 		bool enableMouseMove{false};
 		ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
 		ImVec4 lamp_color = ImVec4(1.f, 1.f, 1.f, 1.f);
@@ -44,7 +51,8 @@ namespace GlNs
 			glm::vec3 pos{ 0.65f, 0.2f, 1.75f };//??
 			bool autoRotation{false};
 			//bool directional{false};
-			LightType type{ LightType::Directional };
+			//LightType type{ LightType::Directional };
+			bool dir, point{true}, spot;
 			bool attenuation{false};
 			bool softEdges{false};
 		} lamp;

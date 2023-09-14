@@ -24,6 +24,7 @@ namespace
         glGenTextures(1, &textureID);
 
         int width, height, nrComponents;
+        stbi_set_flip_vertically_on_load(true);
         unsigned char* data = stbi_load(path, &width, &height, &nrComponents, 0);
         if (data)
         {
@@ -138,48 +139,6 @@ void glInit()
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
     glEnableVertexAttribArray(0);
 
-#if 0
-    glGenTextures(1, &texture1);
-    glBindTexture(GL_TEXTURE_2D, texture1);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    int width, height, nrChannels;
-    stbi_set_flip_vertically_on_load(true);
-    unsigned char* data = stbi_load("../resources/textures/container.jpg", &width, &height, &nrChannels, 0);
-    if (data)
-    {
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
-        glGenerateMipmap(GL_TEXTURE_2D);
-    }
-    else
-    {
-        std::cout << "Failed to load texture" << std::endl;
-    }
-    stbi_image_free(data);
-    glGenTextures(1, &texture2);
-    glBindTexture(GL_TEXTURE_2D, texture2);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    data = stbi_load("../resources/textures/awesomeface.png", &width, &height, &nrChannels, 0);
-    if (data)
-    {
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
-        glGenerateMipmap(GL_TEXTURE_2D);
-    }
-    else
-    {
-        std::cout << "Failed to load texture" << std::endl;
-    }
-    stbi_image_free(data);
-
-    ourShader->use();
-    glUniform1i(glGetUniformLocation(ourShader->ID, "texture1"), 0);
-    ourShader->setInt("texture2", 1);
-#endif
     diffuseMap = loadTexture("../resources/textures/container2.png");
     specularMap = loadTexture("../resources/textures/container2_specular.png");
     ourShader->use();
@@ -193,12 +152,6 @@ void glDraw()
     glClearColor(GlNs::gData.clear_color.x * GlNs::gData.clear_color.w, GlNs::gData.clear_color.y * GlNs::gData.clear_color.w, GlNs::gData.clear_color.z * GlNs::gData.clear_color.w, GlNs::gData.clear_color.w);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-#if 0
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, texture1);
-    glActiveTexture(GL_TEXTURE1);
-    glBindTexture(GL_TEXTURE_2D, texture2);
-#endif
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, diffuseMap);
     glActiveTexture(GL_TEXTURE1);
@@ -210,8 +163,8 @@ void glDraw()
         const auto camX = static_cast<float>(std::sin(glfwGetTime()) * radius);
         const auto camZ = static_cast<float>(std::cos(glfwGetTime()) * radius);
         //std::cout << camX << " " << camZ << std::endl;;// " " << std::sin(glfwGetTime()) << " " << glfwGetTime() << "\n";
-        GlNs::gData.lamp.pos.x = camX;
-        GlNs::gData.lamp.pos.z = camZ;
+        GlNs::gData.pointLightPositions[0].x = camX;
+        GlNs::gData.pointLightPositions[0].z = camZ;
     }
 
     glm::mat4 model{ 1.f };
@@ -247,33 +200,79 @@ void glDraw()
     ourShader->setMat4("view", view);
     ourShader->setMat4("projection", projection);
 
-    ourShader->setInt("light.type", static_cast<int>(GlNs::gData.lamp.type));
-    switch (GlNs::gData.lamp.type)
+    ourShader->setBool("u_light.dir", GlNs::gData.lamp.dir);
+    ourShader->setBool("u_light.spot", GlNs::gData.lamp.spot);
+    ourShader->setBool("u_light.point", GlNs::gData.lamp.point);
+    ourShader->setBool("u_light.attenuation", GlNs::gData.lamp.attenuation);
+    ourShader->setBool("u_light.softEdges", GlNs::gData.lamp.softEdges);
+    //switch (GlNs::gData.lamp.type)
     {
-    case LightType::Directional:
-        ourShader->setVec3("light.direction", -GlNs::gData.lamp.pos);
-        break;
-    case LightType::Point:
-        ourShader->setVec3("light.position", GlNs::gData.lamp.pos);
-        ourShader->setBool("light.attenuation", GlNs::gData.lamp.attenuation);
-        ourShader->setFloat("light.constant", 1.0f);
-        ourShader->setFloat("light.linear", 0.09f);
-        ourShader->setFloat("light.quadratic", 0.032f);
-        break;
-    case LightType::Spot:
-#if 1
-        ourShader->setVec3("light.position", GlNs::gData.lamp.pos);
-        ourShader->setVec3("light.direction", -GlNs::gData.lamp.pos);
+    //case LightType::Directional:
+        //ourShader->setVec3("light.direction", -GlNs::gData.lamp.pos);
+#if 0
+        ourShader->setVec3("dirLight.direction", -0.2f, -1.0f, -0.3f);
 #else
-        ourShader->setVec3("light.position", GlNs::gData.camera.camera.Position);
-        ourShader->setVec3("light.direction", GlNs::gData.camera.camera.Front);
+        ourShader->setVec3("dirLight.direction", -GlNs::gData.pointLightPositions[0]);
 #endif
-        ourShader->setFloat("light.cutOff", glm::cos(glm::radians(12.5f)));
-        ourShader->setFloat("light.outerCutOff", glm::cos(glm::radians(17.5f)));
-        ourShader->setBool("light.softEdges", GlNs::gData.lamp.softEdges);
-        break;
-    default:
-        break;
+        ourShader->setVec3("dirLight.ambient", 0.05f, 0.05f, 0.05f);
+        ourShader->setVec3("dirLight.diffuse", 0.4f, 0.4f, 0.4f);
+        ourShader->setVec3("dirLight.specular", 0.5f, 0.5f, 0.5f);
+        //break;
+    //case LightType::Point:
+
+        // point light 1
+        ourShader->setVec3("pointLights[0].position", GlNs::gData.pointLightPositions[0]);
+        ourShader->setVec3("pointLights[0].ambient", 0.05f, 0.05f, 0.05f);
+        ourShader->setVec3("pointLights[0].diffuse", 0.8f, 0.8f, 0.8f);
+        ourShader->setVec3("pointLights[0].specular", 1.0f, 1.0f, 1.0f);
+        ourShader->setFloat("pointLights[0].constant", 1.0f);
+        ourShader->setFloat("pointLights[0].linear", 0.09f);
+        ourShader->setFloat("pointLights[0].quadratic", 0.032f);
+        // point light 2
+        ourShader->setVec3("pointLights[1].position", GlNs::gData.pointLightPositions[1]);
+        ourShader->setVec3("pointLights[1].ambient", 0.05f, 0.05f, 0.05f);
+        ourShader->setVec3("pointLights[1].diffuse", 0.8f, 0.8f, 0.8f);
+        ourShader->setVec3("pointLights[1].specular", 1.0f, 1.0f, 1.0f);
+        ourShader->setFloat("pointLights[1].constant", 1.0f);
+        ourShader->setFloat("pointLights[1].linear", 0.09f);
+        ourShader->setFloat("pointLights[1].quadratic", 0.032f);
+        // point light 3
+        ourShader->setVec3("pointLights[2].position", GlNs::gData.pointLightPositions[2]);
+        ourShader->setVec3("pointLights[2].ambient", 0.05f, 0.05f, 0.05f);
+        ourShader->setVec3("pointLights[2].diffuse", 0.8f, 0.8f, 0.8f);
+        ourShader->setVec3("pointLights[2].specular", 1.0f, 1.0f, 1.0f);
+        ourShader->setFloat("pointLights[2].constant", 1.0f);
+        ourShader->setFloat("pointLights[2].linear", 0.09f);
+        ourShader->setFloat("pointLights[2].quadratic", 0.032f);
+        // point light 4
+        ourShader->setVec3("pointLights[3].position", GlNs::gData.pointLightPositions[3]);
+        ourShader->setVec3("pointLights[3].ambient", 0.05f, 0.05f, 0.05f);
+        ourShader->setVec3("pointLights[3].diffuse", 0.8f, 0.8f, 0.8f);
+        ourShader->setVec3("pointLights[3].specular", 1.0f, 1.0f, 1.0f);
+        ourShader->setFloat("pointLights[3].constant", 1.0f);
+        ourShader->setFloat("pointLights[3].linear", 0.09f);
+        ourShader->setFloat("pointLights[3].quadratic", 0.032f);
+        //break;
+    //case LightType::Spot:
+
+#if 0
+        ourShader->setVec3("spotLight.position", GlNs::gData.camera.camera.Position);
+        ourShader->setVec3("spotLight.direction", GlNs::gData.camera.camera.Front);
+#else
+        ourShader->setVec3("spotLight.position", GlNs::gData.pointLightPositions[0]);
+        ourShader->setVec3("spotLight.direction", -GlNs::gData.pointLightPositions[0]);
+#endif
+        ourShader->setVec3("spotLight.ambient", 0.0f, 0.0f, 0.0f);
+        ourShader->setVec3("spotLight.diffuse", 1.0f, 1.0f, 1.0f);
+        ourShader->setVec3("spotLight.specular", 1.0f, 1.0f, 1.0f);
+        ourShader->setFloat("spotLight.constant", 1.0f);
+        ourShader->setFloat("spotLight.linear", 0.09f);
+        ourShader->setFloat("spotLight.quadratic", 0.032f);
+        ourShader->setFloat("spotLight.cutOff", glm::cos(glm::radians(12.5f)));
+        ourShader->setFloat("spotLight.outerCutOff", glm::cos(glm::radians(15.0f)));
+        //break;
+    //default:
+        //break;
     }
 
     ourShader->setVec3("viewPos", GlNs::gData.camera.camera.Position);
@@ -337,11 +336,15 @@ void glDraw()
         lightCubeShader->setVec3("lightColor", GlNs::gData.lamp_color.x, GlNs::gData.lamp_color.y, GlNs::gData.lamp_color.z);
         lightCubeShader->setMat4("projection", projection);
         lightCubeShader->setMat4("view", view);
-        model = glm::mat4(1.0f);
-        model = glm::translate(model, GlNs::gData.lamp.pos);
-        model = glm::scale(model, glm::vec3(0.2f));
-        lightCubeShader->setMat4("model", model);
+
         glBindVertexArray(GlNs::gData.lightCubeVAO);
-        glDrawArrays(GL_TRIANGLES, 0, 36);
+        for (auto i = 0; i < 4; ++i)
+        {
+            model = glm::mat4(1.0f);
+            model = glm::translate(model, GlNs::gData.pointLightPositions[i]);
+            model = glm::scale(model, glm::vec3(0.2f)); // Make it a smaller cube
+            lightCubeShader->setMat4("model", model);
+            glDrawArrays(GL_TRIANGLES, 0, 36);
+        }
     }
 }

@@ -1,4 +1,6 @@
-#include "ImguiDraw.h"
+﻿#include "ImguiDraw.h"
+
+#include <string>
 
 #include "Common.h"
 
@@ -36,13 +38,23 @@ namespace
             ImGui::Checkbox("autoRotation", &lamp.autoRotation);
             ImGui::Checkbox("softEdges", &lamp.softEdges);
             //ImGui::Checkbox("directional", &lamp.directional);
-
+            ImGui::Checkbox("dir", &lamp.dir); ImGui::SameLine();
+            ImGui::Checkbox("point", &lamp.point); ImGui::SameLine();
+            ImGui::Checkbox("spot", &lamp.spot);
+#if 0
             auto& lampType = lamp.type;
             ImGui::RadioButton("Directional", reinterpret_cast<int*>(&lampType), static_cast<int>(LightType::Directional)); ImGui::SameLine();
             ImGui::RadioButton("Point", reinterpret_cast<int*>(&lampType), static_cast<int>(LightType::Point)); ImGui::SameLine();
             ImGui::RadioButton("Spot", reinterpret_cast<int*>(&lampType), static_cast<int>(LightType::Spot));
-
-            ImGui::DragFloat3("pos", &lamp.pos[0], .05f);
+#endif
+            if (ImGui::TreeNode("点光源"))
+            {
+                for (auto i = 0; i < std::size(GlNs::gData.pointLightPositions); ++i)
+                {
+                    ImGui::DragFloat3(std::to_string(i).data(), &GlNs::gData.pointLightPositions[i][0], .05f);
+                }
+                ImGui::TreePop();
+            }
             ImGui::DragFloat("shininess", &GlNs::gData.shininess, 2, 2, 256);
             ImGui::TreePop();
         }
