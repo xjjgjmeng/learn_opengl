@@ -10,6 +10,19 @@
 
 namespace
 {
+    void modelSetup()
+    {
+        if (ImGui::TreeNode("Model"))
+        {
+            auto& model = GlNs::gData.model;
+            ImGui::Checkbox("可见", &model.visible);
+            ImGui::DragFloat3("pos", &model.pos[0], .05f);
+            ImGui::DragFloat("scale", &model.scale, .05f, 0.1, 10);
+            ImGui::DragFloat("rotate", &model.rotate, .5f, -360, 360);
+            ImGui::TreePop();
+        }
+    }
+
     void cameraSetup()
     {
         if (ImGui::TreeNode("Camera"))
@@ -119,6 +132,7 @@ void imguiDraw()
 
         cameraSetup();
         lampSetup();
+        modelSetup();
 
         ImGuiIO& io = ImGui::GetIO();
         ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / io.Framerate, io.Framerate);

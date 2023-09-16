@@ -3,16 +3,18 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
-#define STB_IMAGE_IMPLEMENTATION
 #include <stb_image.h>
 
 #include "shader_m.h"
 #include "Common.h"
+#include <learnopengl/model.h>
 
 Shader* ourShader{};
 unsigned int texture1, texture2;
 
 Shader* lightCubeShader{};
+
+Model* myModel{};
 
 namespace
 {
@@ -142,8 +144,11 @@ void glInit()
     diffuseMap = loadTexture("../resources/textures/container2.png");
     specularMap = loadTexture("../resources/textures/container2_specular.png");
     ourShader->use();
-    ourShader->setInt("material.diffuse", 0);
-    ourShader->setInt("material.specular", 1);
+    ourShader->setInt("material.texture_diffuse1", 0);
+    ourShader->setInt("material.texture_specular1", 1);
+
+    myModel = new Model("../resources/objects/backpack/backpack.obj");
+    //myModel = new Model("../resources/objects/nanosuit/nanosuit.obj");
 }
 
 void glDraw()
@@ -328,6 +333,17 @@ void glDraw()
     else
     {
         glDrawArrays(GL_TRIANGLES, 0, 36);
+    }
+
+    const auto modelData = GlNs::gData.model;
+    if (GlNs::gData.model.visible)
+    {
+        glm::mat4 model{ 1.f };
+        model = glm::translate(model, modelData.pos);
+        model = glm::rotate(model, glm::radians(modelData.rotate), glm::vec3{ 1.f,0.f,0.f });
+        model = glm::scale(model, glm::vec3(modelData.scale));
+        ourShader->setMat4("model", model);
+        myModel->Draw(*ourShader);
     }
 
     // ªÊ÷∆π‚‘¥
