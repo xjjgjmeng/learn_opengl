@@ -1,4 +1,5 @@
 build/
 Bin/
 Lib/
+assimp/
 imgui.ini

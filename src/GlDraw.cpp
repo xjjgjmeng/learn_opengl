@@ -153,6 +153,7 @@ void glInit()
 
 void glDraw()
 {
+    glDepthFunc(GlNs::gData.depthFunc);
     GlNs::gData.depthTesting ? glEnable(GL_DEPTH_TEST) : glDisable(GL_DEPTH_TEST);
     glClearColor(GlNs::gData.clear_color.x * GlNs::gData.clear_color.w, GlNs::gData.clear_color.y * GlNs::gData.clear_color.w, GlNs::gData.clear_color.z * GlNs::gData.clear_color.w, GlNs::gData.clear_color.w);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -200,6 +201,7 @@ void glDraw()
     }
     projection = glm::perspective(glm::radians(GlNs::gData.camera.camera.Zoom), float(GlNs::gData.windowW) / GlNs::gData.windowH, GlNs::gData.nearP, GlNs::gData.farP);
     ourShader->use();
+    ourShader->setBool("u_linearizeDepth", GlNs::gData.LinearizeDepth);
     ourShader->setVec3("lightColor", GlNs::gData.lamp_color.x, GlNs::gData.lamp_color.y, GlNs::gData.lamp_color.z);
     ourShader->setMat4("model", model);
     ourShader->setMat4("view", view);

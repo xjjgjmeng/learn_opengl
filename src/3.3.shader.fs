@@ -60,6 +60,7 @@ struct SpotLight {
 
 uniform vec3 viewPos;
 uniform bool showSmile;
+uniform bool u_linearizeDepth;
 uniform Material material;
 uniform DirLight dirLight;
 uniform PointLight pointLights[NR_POINT_LIGHTS];
@@ -149,8 +150,23 @@ vec3 CalcSpotLight(SpotLight light, vec3 normal, vec3 fragPos, vec3 viewDir)
     return (ambient + diffuse + specular);
 }
 
+float near = 0.1; 
+float far = 100.0; 
+float LinearizeDepth(float depth) 
+{
+    float z = depth * 2.0 - 1.0; // back to NDC 
+    return (2.0 * near * far) / (far + near - z * (far - near));	
+}
+
 void main()
 {
+    if (u_linearizeDepth)
+    {
+        float depth = LinearizeDepth(gl_FragCoord.z) / far; // divide by far to get depth in range [0,1] for visualization purposes
+        FragColor = vec4(vec3(depth), 1.0);
+        return;
+    }
+
 	const int directionalLight_ = 0;
 	const int pointLight_ = 1;
 	const int spotLight_ = 2;

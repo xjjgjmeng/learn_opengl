@@ -41,6 +41,8 @@ namespace GlNs
 		float nearP{ 0.1f }, farP{ 100.f };
 		//float fov{ 45.f };
 		bool depthTesting{true};
+		bool LinearizeDepth{ false };
+		int depthFunc{GL_LESS};
 		bool showMore{ false };
 		bool rotateByTime{ true };
 		bool showSmile{false};

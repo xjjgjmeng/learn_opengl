@@ -127,6 +127,22 @@ void imguiDraw()
 
 
         ImGui::Checkbox("depth testing", &GlNs::gData.depthTesting);
+        ImGui::Checkbox("LinearizeDepth", &GlNs::gData.LinearizeDepth);
+        if (ImGui::TreeNode("depthfunc"))
+        {
+            auto& depthFunc = GlNs::gData.depthFunc;
+            ImGui::RadioButton("GL_ALWAYS", reinterpret_cast<int*>(&depthFunc), GL_ALWAYS);
+            ImGui::RadioButton("GL_NEVER", reinterpret_cast<int*>(&depthFunc), GL_NEVER);
+            ImGui::RadioButton("GL_LESS", reinterpret_cast<int*>(&depthFunc), GL_LESS);
+            ImGui::RadioButton("GL_EQUAL", reinterpret_cast<int*>(&depthFunc), GL_EQUAL);
+            ImGui::RadioButton("GL_LEQUAL", reinterpret_cast<int*>(&depthFunc), GL_LEQUAL);
+            ImGui::RadioButton("GL_GREATER", reinterpret_cast<int*>(&depthFunc), GL_GREATER);
+            ImGui::RadioButton("GL_NOTEQUAL", reinterpret_cast<int*>(&depthFunc), GL_NOTEQUAL);
+            ImGui::RadioButton("GL_GEQUAL", reinterpret_cast<int*>(&depthFunc), GL_GEQUAL);
+
+            ImGui::TreePop();
+        }
+
         ImGui::Checkbox("more cube", &GlNs::gData.showMore);
         ImGui::Checkbox("rotate by time", &GlNs::gData.rotateByTime);
 
