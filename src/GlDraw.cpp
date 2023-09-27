@@ -8,6 +8,7 @@
 #include "shader_m.h"
 #include "Common.h"
 #include <learnopengl/model.h>
+#include "Volume.h"
 
 Shader* ourShader{};
 unsigned int texture1, texture2;
@@ -174,8 +175,6 @@ void glDraw()
     }
 
     glm::mat4 model{ 1.f };
-    glm::mat4 view{ 1.f };
-    glm::mat4 projection{ 1.f };
     if (GlNs::gData.rotateByTime)
     {
         GlNs::gData.ang = static_cast<float>(std::sin(glfwGetTime() / 3) * 360.f);
@@ -188,7 +187,7 @@ void glDraw()
         auto radius = 8.f;
         const auto camX = static_cast<float>(std::sin(glfwGetTime()) * radius);
         const auto camZ = static_cast<float>(std::cos(glfwGetTime()) * radius);
-        view = glm::lookAt(glm::vec3(camX, 0.f, camZ), glm::vec3(0.f, 0.f, 0.f), glm::vec3{ 0.f, 1.f, 0.f });
+        GlNs::gData.camera.view = glm::lookAt(glm::vec3(camX, 0.f, camZ), glm::vec3(0.f, 0.f, 0.f), glm::vec3{ 0.f, 1.f, 0.f });
 #else
         GlNs::gData.camera.camera.Position = glm::vec3(camX, 0.f, camZ);
         view = GlNs::gData.camera.camera.GetViewMatrix();
@@ -197,15 +196,15 @@ void glDraw()
     else
     {
         auto& camera = GlNs::gData.camera;
-        view = camera.camera.GetViewMatrix();
+        GlNs::gData.camera.view = camera.camera.GetViewMatrix();
     }
-    projection = glm::perspective(glm::radians(GlNs::gData.camera.camera.Zoom), float(GlNs::gData.windowW) / GlNs::gData.windowH, GlNs::gData.nearP, GlNs::gData.farP);
+    GlNs::gData.camera.projection = glm::perspective(glm::radians(GlNs::gData.camera.camera.Zoom), float(GlNs::gData.windowW) / GlNs::gData.windowH, GlNs::gData.nearP, GlNs::gData.farP);
     ourShader->use();
     ourShader->setBool("u_linearizeDepth", GlNs::gData.LinearizeDepth);
     ourShader->setVec3("lightColor", GlNs::gData.lamp_color.x, GlNs::gData.lamp_color.y, GlNs::gData.lamp_color.z);
     ourShader->setMat4("model", model);
-    ourShader->setMat4("view", view);
-    ourShader->setMat4("projection", projection);
+    ourShader->setMat4("view", GlNs::gData.camera.view);
+    ourShader->setMat4("projection", GlNs::gData.camera.projection);
 
     ourShader->setBool("u_light.dir", GlNs::gData.lamp.dir);
     ourShader->setBool("u_light.spot", GlNs::gData.lamp.spot);
@@ -352,8 +351,8 @@ void glDraw()
     {
         lightCubeShader->use();
         lightCubeShader->setVec3("lightColor", GlNs::gData.lamp_color.x, GlNs::gData.lamp_color.y, GlNs::gData.lamp_color.z);
-        lightCubeShader->setMat4("projection", projection);
-        lightCubeShader->setMat4("view", view);
+        lightCubeShader->setMat4("projection", GlNs::gData.camera.projection);
+        lightCubeShader->setMat4("view", GlNs::gData.camera.view);
 
         glBindVertexArray(GlNs::gData.lightCubeVAO);
         for (auto i = 0; i < 4; ++i)
@@ -364,5 +363,10 @@ void glDraw()
             lightCubeShader->setMat4("model", model);
             glDrawArrays(GL_TRIANGLES, 0, 36);
         }
+    }
+
+    if (GlNs::gData.volume.visible)
+    {
+        Volume::instance().Draw();
     }
 }

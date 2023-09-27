@@ -67,16 +67,23 @@ namespace GlNs
 			//glm::vec3 cameraUp{ 0.f, 1.f, 0.f };
 			float deltaTime{ 0.f };
 			float lastFrame{ 0.f };
+			glm::mat4 view{ 1.f };
+			glm::mat4 projection{ 1.f };
 			
 		} camera{};
 
 		struct
 		{
-			bool visible{true};
+			bool visible{false};
 			glm::vec3 pos{1.2f, 0.f, 0.15f};
 			float scale{.25f};
 			float rotate{0.f};
 		} model;
+
+		struct
+		{
+			bool visible{false};
+		} volume;
 	};
 	inline GlobalData gData{};
 }
