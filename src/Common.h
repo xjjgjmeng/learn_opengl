@@ -72,7 +72,7 @@ namespace GlNs
 
 		struct
 		{
-			bool visible{false};
+			bool visible{true};
 			glm::vec3 pos{1.2f, 0.f, 0.15f};
 			float scale{.25f};
 			float rotate{0.f};
